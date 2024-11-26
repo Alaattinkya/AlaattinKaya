@@ -9,8 +9,3 @@ Bu proje, öğrenci, öğretim görevlisi ve ders yönetimi için basit bir komu
 - **Ders Ekleme:** Yeni ders ekleyebilir ve öğretim görevlisi atayabilirsiniz.
 - **Öğrenci Kayıtları:** Öğrenciler derslere kaydedilebilir.
 - **Ders Bilgileri Görüntüleme:** Eklenen derslerin bilgilerini listeleyebilirsiniz.
-
-2. **Ana Menü:**
-   - Öğrenci, öğretim görevlisi ve ders ekleyebilirsiniz.
-   - Öğrencileri derslere kaydedebilir ve ders bilgilerini görüntüleyebilirsiniz.
-
