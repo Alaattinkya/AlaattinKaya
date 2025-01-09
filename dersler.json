@@ -1,0 +1,17 @@
+[
+    {
+        "Ad": "Matematik",
+        "Kredi": 3,
+        "OgretimGorevlisi": {"Id": 1, "AdSoyad": "Dr. Mehmet Yılmaz", "Unvan": "Doçent"},
+        "Ogrenciler": [
+            {"Id": 1, "AdSoyad": "Ali Veli"},
+            {"Id": 2, "AdSoyad": "Ayşe Fatma"}
+        ]
+    },
+    {
+        "Ad": "Fizik",
+        "Kredi": 4,
+        "OgretimGorevlisi": {"Id": 2, "AdSoyad": "Prof. Ayla Çetin", "Unvan": "Profesör"},
+        "Ogrenciler": []
+    }
+]
