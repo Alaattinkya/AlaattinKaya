@@ -17,3 +17,5 @@ Kayıtlı dersleri listeleme
 Öğrenci ve öğretim görevlisi listeleme
 
 Verileri JSON dosyalarına kaydetme ve yükleme
+
+![image](https://github.com/user-attachments/assets/2252ad98-396d-4989-a6ea-a8e425ba0848)
