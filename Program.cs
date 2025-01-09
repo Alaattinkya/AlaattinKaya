@@ -1,114 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace OgrenciDersYonetimSistemi
 {
-    // Temel Sınıf (Base Class)
-    abstract class Kisi
-    {
-        public int Id { get; set; }
-        public string AdSoyad { get; set; }
-
-        protected Kisi(int id, string adSoyad)
-        {
-            Id = id;
-            AdSoyad = adSoyad;
-        }
-
-        public abstract void BilgiGoster();
-    }
-
-    // Öğrenci Sınıfı
-    class Ogrenci : Kisi
-    {
-        public Ogrenci(int id, string adSoyad) : base(id, adSoyad) { }
-
-        public override void BilgiGoster()
-        {
-            Console.WriteLine($"Öğrenci ID: {Id}, Ad Soyad: {AdSoyad}");
-        }
-    }
-
-    // Öğretim Görevlisi Sınıfı
-    class OgretimGorevlisi : Kisi
-    {
-        public string Unvan { get; set; }
-
-        public OgretimGorevlisi(int id, string adSoyad, string unvan) : base(id, adSoyad)
-        {
-            Unvan = unvan;
-        }
-
-        public override void BilgiGoster()
-        {
-            Console.WriteLine($"Öğretim Görevlisi ID: {Id}, Ad Soyad: {AdSoyad}, Ünvan: {Unvan}");
-        }
-    }
-
-    // Ders Sınıfı
-    class Ders
-    {
-        public string Ad { get; set; }
-        public int Kredi { get; set; }
-        public OgretimGorevlisi OgretimGorevlisi { get; set; }
-        public List<Ogrenci> Ogrenciler { get; private set; }
-
-        public Ders(string ad, int kredi, OgretimGorevlisi ogretimGorevlisi)
-        {
-            Ad = ad;
-            Kredi = kredi;
-            OgretimGorevlisi = ogretimGorevlisi;
-            Ogrenciler = new List<Ogrenci>();
-        }
-
-        public void OgrenciEkle(Ogrenci ogrenci)
-        {
-            Ogrenciler.Add(ogrenci);
-        }
-
-        public void BilgiGoster()
-        {
-            Console.WriteLine($"Ders Adı: {Ad}, Kredi: {Kredi}");
-
-            // Öğretim görevlisini kontrol et
-            if (OgretimGorevlisi != null)
-            {
-                Console.WriteLine($"Dersi Veren: {OgretimGorevlisi.AdSoyad} ({OgretimGorevlisi.Unvan})");
-            }
-            else
-            {
-                Console.WriteLine("Dersin öğretim görevlisi atanmadı.");
-            }
-
-            // Öğrencileri kontrol et
-            if (Ogrenciler.Count > 0)
-            {
-                Console.WriteLine("Kayıtlı Öğrenciler:");
-                foreach (var ogrenci in Ogrenciler)
-                {
-                    ogrenci.BilgiGoster();
-                }
-            }
-            else
-            {
-                Console.WriteLine("Bu derse kayıtlı öğrenci yok.");
-            }
-        }
-    }
-
-    // Ana Program
     class Program
     {
+        static string ogrencilerPath = "ogrenciler.json";
+        static string ogretimGorevlileriPath = "ogretimGorevlileri.json";
+        static string derslerPath = "dersler.json";
+
         static List<Ogrenci> ogrenciler = new List<Ogrenci>();
         static List<OgretimGorevlisi> ogretimGorevlileri = new List<OgretimGorevlisi>();
         static List<Ders> dersler = new List<Ders>();
 
         static void Main(string[] args)
         {
+            DosyalariOku();
+
             while (true)
             {
-                Console.Clear(); // Ekranı temizle
+                Console.Clear();
                 Console.WriteLine("===============================================");
                 Console.WriteLine("   Öğrenci ve Ders Yönetim Sistemi");
                 Console.WriteLine("===============================================");
@@ -117,6 +31,8 @@ namespace OgrenciDersYonetimSistemi
                 Console.WriteLine("3. Yeni Ders Ekle");
                 Console.WriteLine("4. Derslere Öğrenci Ekle");
                 Console.WriteLine("5. Ders Bilgilerini Listele");
+                Console.WriteLine("6. Öğrencileri Listele");
+                Console.WriteLine("7. Öğretim Görevlilerini Listele");
                 Console.WriteLine("0. Çıkış");
                 Console.WriteLine("===============================================");
                 Console.Write("Seçiminiz: ");
@@ -139,7 +55,14 @@ namespace OgrenciDersYonetimSistemi
                     case "5":
                         DersleriListele();
                         break;
+                    case "6":
+                        OgrencileriListele();
+                        break;
+                    case "7":
+                        OgretimGorevlileriniListele();
+                        break;
                     case "0":
+                        DosyalariKaydet();
                         Console.WriteLine("Sistemden çıkılıyor...");
                         return;
                     default:
@@ -247,13 +170,63 @@ namespace OgrenciDersYonetimSistemi
                 foreach (var ders in dersler)
                 {
                     ders.BilgiGoster();
-                    Console.WriteLine(); // Görsellik için her dersin altına bir boşluk ekleyelim
+                    Console.WriteLine();
                 }
             }
             DevamEt();
         }
 
-        // Yardımcı metodlar
+        static void OgrencileriListele()
+        {
+            if (ogrenciler.Count == 0)
+            {
+                Console.WriteLine("Henüz öğrenci eklenmedi.");
+            }
+            else
+            {
+                foreach (var ogrenci in ogrenciler)
+                {
+                    ogrenci.BilgiGoster();
+                }
+            }
+            DevamEt();
+        }
+
+        static void OgretimGorevlileriniListele()
+        {
+            if (ogretimGorevlileri.Count == 0)
+            {
+                Console.WriteLine("Henüz öğretim görevlisi eklenmedi.");
+            }
+            else
+            {
+                foreach (var ogretimGorevlisi in ogretimGorevlileri)
+                {
+                    ogretimGorevlisi.BilgiGoster();
+                }
+            }
+            DevamEt();
+        }
+
+        static void DosyalariOku()
+        {
+            if (File.Exists(ogrencilerPath))
+                ogrenciler = JsonSerializer.Deserialize<List<Ogrenci>>(File.ReadAllText(ogrencilerPath));
+
+            if (File.Exists(ogretimGorevlileriPath))
+                ogretimGorevlileri = JsonSerializer.Deserialize<List<OgretimGorevlisi>>(File.ReadAllText(ogretimGorevlileriPath));
+
+            if (File.Exists(derslerPath))
+                dersler = JsonSerializer.Deserialize<List<Ders>>(File.ReadAllText(derslerPath));
+        }
+
+        static void DosyalariKaydet()
+        {
+            File.WriteAllText(ogrencilerPath, JsonSerializer.Serialize(ogrenciler));
+            File.WriteAllText(ogretimGorevlileriPath, JsonSerializer.Serialize(ogretimGorevlileri));
+            File.WriteAllText(derslerPath, JsonSerializer.Serialize(dersler));
+        }
+
         static int GirisAlInt(string mesaj)
         {
             int deger;
@@ -288,8 +261,6 @@ namespace OgrenciDersYonetimSistemi
             {
                 Console.Write(mesaj);
                 deger = Console.ReadLine();
-
-                // Ad Soyad sadece harflerden oluşmalı
                 if (deger.All(c => char.IsLetter(c) || c == ' '))
                 {
                     return deger;
@@ -306,5 +277,87 @@ namespace OgrenciDersYonetimSistemi
             Console.WriteLine("\nDevam etmek için bir tuşa basın...");
             Console.ReadKey();
         }
+    }
+
+    // JSON serileştirme için sınıflara boş kurucular eklenmeli
+    class Ogrenci : Kisi
+    {
+        public Ogrenci() : base(0, "") { }
+        public Ogrenci(int id, string adSoyad) : base(id, adSoyad) { }
+
+        public override void BilgiGoster()
+        {
+            Console.WriteLine($"Öğrenci ID: {Id}, Ad Soyad: {AdSoyad}");
+        }
+    }
+
+    class OgretimGorevlisi : Kisi
+    {
+        public string Unvan { get; set; }
+        public OgretimGorevlisi() : base(0, "") { }
+        public OgretimGorevlisi(int id, string adSoyad, string unvan) : base(id, adSoyad)
+        {
+            Unvan = unvan;
+        }
+
+        public override void BilgiGoster()
+        {
+            Console.WriteLine($"Öğretim Görevlisi ID: {Id}, Ad Soyad: {AdSoyad}, Ünvan: {Unvan}");
+        }
+    }
+
+    class Ders
+    {
+        public string Ad { get; set; }
+        public int Kredi { get; set; }
+        public OgretimGorevlisi OgretimGorevlisi { get; set; }
+        public List<Ogrenci> Ogrenciler { get; set; }
+
+        public Ders() { Ogrenciler = new List<Ogrenci>(); }
+        public Ders(string ad, int kredi, OgretimGorevlisi ogretimGorevlisi)
+        {
+            Ad = ad;
+            Kredi = kredi;
+            OgretimGorevlisi = ogretimGorevlisi;
+            Ogrenciler = new List<Ogrenci>();
+        }
+
+        public void OgrenciEkle(Ogrenci ogrenci)
+        {
+            Ogrenciler.Add(ogrenci);
+        }
+
+        public void BilgiGoster()
+        {
+            Console.WriteLine($"Ders Adı: {Ad}, Kredi: {Kredi}");
+
+            if (OgretimGorevlisi != null)
+                Console.WriteLine($"Dersi Veren: {OgretimGorevlisi.AdSoyad} ({OgretimGorevlisi.Unvan})");
+
+            if (Ogrenciler.Count > 0)
+            {
+                Console.WriteLine("Kayıtlı Öğrenciler:");
+                foreach (var ogrenci in Ogrenciler)
+                    ogrenci.BilgiGoster();
+            }
+            else
+            {
+                Console.WriteLine("Bu derse kayıtlı öğrenci yok.");
+            }
+        }
+    }
+
+    abstract class Kisi
+    {
+        public int Id { get; set; }
+        public string AdSoyad { get; set; }
+
+        protected Kisi(int id, string adSoyad)
+        {
+            Id = id;
+            AdSoyad = adSoyad;
+        }
+
+        public abstract void BilgiGoster();
     }
 }
